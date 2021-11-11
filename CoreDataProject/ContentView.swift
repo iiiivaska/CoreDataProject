@@ -8,20 +8,41 @@
 import SwiftUI
 import CoreData
 
-struct Student: Hashable {
-    let name: String
-}
-
 struct ContentView: View {
     
-    let students = [Student(name: "Harry Potter"), Student(name: "Hermione Granger")]
+    @Environment(\.managedObjectContext) var moc
+    @State private var lastNameFilter = "A"
     
     var body: some View {
-        List(students, id: \.self) { student in
-            Text(student.name)
-                .onTapGesture {
-                    print(student.hashValue)
+        VStack {
+            
+            FilteredList(filter: lastNameFilter)
+            
+            Button("Add Examples") {
+                let taylor = Singer(context: self.moc)
+                taylor.firstName = "Taylor"
+                taylor.lastName = "Swift"
+
+                let ed = Singer(context: self.moc)
+                ed.firstName = "Ed"
+                ed.lastName = "Sheeran"
+
+                let adele = Singer(context: self.moc)
+                adele.firstName = "Adele"
+                adele.lastName = "Adkins"
+                    
+                if (moc.hasChanges) {
+                    try? self.moc.save()
                 }
+            }
+
+            Button("Show A") {
+                self.lastNameFilter = "A"
+            }
+
+            Button("Show S") {
+                self.lastNameFilter = "S"
+            }
         }
     }
 }
